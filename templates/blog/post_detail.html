@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<article>
+    {% if post.featured_image %}
+        <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="img-fluid mb-4 rounded">
+    {% endif %}
+    <h1 class="mb-3">{{ post.title }}</h1>
+    <p class="text-muted">
+        By {{ post.author.username }} | {{ post.created_at|date:"F j, Y" }}
+        {% if post.category %}
+            | <a href="{% url 'category_posts' post.category.slug %}">{{ post.category.name }}</a>
+        {% endif %}
+    </p>
+
+    {% if post.tags.all %}
+        <p class="mb-3">
+            {% for tag in post.tags.all %}
+                <a href="{% url 'tag_posts' tag.slug %}" class="badge bg-secondary text-decoration-none">{{ tag.name }}</a>
+            {% endfor %}
+        </p>
+    {% endif %}
+
+    {% comment %} {% if user == post.author %}
+        <p class="mb-3">
+            <a href="{% url 'post_update' post.slug %}" class="btn btn-sm btn-outline-primary">Edit</a>
+            <a href="{% url 'post_delete' post.slug %}" class="btn btn-sm btn-outline-danger">Delete</a>
+        </p>
+    {% endif %} {% endcomment %}
+
+    <div class="content-body mb-4">
+        {{ post.content|safe }}
+    </div>
+</article>
+
+<hr>
+
+<section class="comment-section mt-4">
+    <h3>Comments ({{ post.comments.count }})</h3>
+
+    {% if user.is_authenticated %}
+        <form method="post" class="mb-4">
+            {% csrf_token %}
+            {{ comment_form.as_p }}
+            <button type="submit" class="btn btn-primary">Submit Comment</button>
+        </form>
+    {% else %}
+        <p><a href="{% url 'login' %}">Login</a> to leave a comment.</p>
+    {% endif %}
+
+    {% for comment in comments %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ comment.author.username }}</h5>
+                <p class="card-text">{{ comment.content }}</p>
+                <p class="text-muted small">{{ comment.created_at|date:"F j, Y H:i" }}</p>
+            </div>
+        </div>
+    {% empty %}
+        <p>No comments yet. Be the first to comment!</p>
+    {% endfor %}
+</section>
+{% endblock %}
