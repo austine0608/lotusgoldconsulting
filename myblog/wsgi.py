@@ -11,6 +11,7 @@ import os
 import sys
 
 from django.core.wsgi import get_wsgi_application
+from whitenoise import WhiteNoise
 
 path = '/home/yourusername/lotusgoldconsulting'
 if path not in sys.path:
@@ -19,3 +20,4 @@ if path not in sys.path:
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "myblog.settings")
 
 application = get_wsgi_application()
+application = WhiteNoise(application, root=os.path.join(path, 'staticfiles'))
